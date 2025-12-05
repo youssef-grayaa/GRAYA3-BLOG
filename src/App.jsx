@@ -187,7 +187,7 @@ function App() {
       <div className="app">
         <PixelBlastBg />
         <button className="theme-toggle" onClick={cycleTheme} title={`Theme: ${currentTheme}`}>
-          <img src="/angry.png" alt="Change Theme" />
+          <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
         </button>
         <div className="header" style={{ position: 'relative', zIndex: 1 }}>
           <ShinyText text="GRAYAA_VX" />
@@ -240,14 +240,14 @@ function App() {
       <div className="app">
         <PixelBlastBg />
         <button className="theme-toggle" onClick={cycleTheme} title={`Theme: ${currentTheme}`}>
-          <img src="/angry.png" alt="Change Theme" />
+          <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
         </button>
         <div className="header" style={{ position: 'relative', zIndex: 1 }}>
           <h1>MALWARE_SHENANIGANS</h1>
           <p>▸ In Development ◂</p>
         </div>
         <button className="back-btn" onClick={() => setPage('home')} style={{position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1}}>
-          <img src="/arrow-right.png" alt="Back" />
+          <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
         </button>
         <div className="about-section" style={{ position: 'relative', zIndex: 1 }}>
           <h2>Coming Soon</h2>
@@ -264,7 +264,7 @@ function App() {
     <div className="app">
       <PixelBlastBg />
       <button className="theme-toggle" onClick={cycleTheme} title={`Theme: ${currentTheme}`}>
-        <img src="/angry.png" alt="Change Theme" />
+        <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
       </button>
       <div className="header" style={{ position: 'relative', zIndex: 1 }}>
         <h1>CTF WRITEUPS</h1>
@@ -274,7 +274,7 @@ function App() {
       {!selected ? (
         <>
           <button className="back-btn" onClick={() => setPage('home')} style={{position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1}}>
-            <img src="/arrow-right.png" alt="Back" />
+            <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
           </button>
           <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
             {challenges.map((c, i) => (
@@ -288,7 +288,7 @@ function App() {
       ) : (
         <>
           <button className="back-btn" onClick={() => setSelected(null)}>
-            <img src="/arrow-right.png" alt="Back" />
+            <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
           </button>
           <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
             <ReactMarkdown>{markdown}</ReactMarkdown>
@@ -312,7 +312,7 @@ function App() {
               </div>
             )}
             <button className="download-btn" onClick={downloadChallenge}>
-              <img src="/slaughter.png" alt="Download" />
+              <img src={`${import.meta.env.BASE_URL}slaughter.png`} alt="Download" />
               DOWNLOAD CHALLENGE
             </button>
           </div>
