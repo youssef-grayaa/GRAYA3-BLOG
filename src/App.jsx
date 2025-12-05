@@ -4,7 +4,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import ShinyText from './components/ShinyText'
 import PixelBlast from './components/PixelBlast'
-import { themes } from './theme'
+import { themes, currentTheme as defaultTheme } from './theme'
 
 const IS_LOCAL = import.meta.env.VITE_LOCAL === 'true'
 const REPO = 'youssef-grayaa/CTF_Writeups'
@@ -27,7 +27,7 @@ function App() {
   const [solver, setSolver] = useState('')
   const [showSolver, setShowSolver] = useState(false)
   const [page, setPage] = useState('home') // 'home', 'ctf', 'malware'
-  const [currentTheme, setCurrentTheme] = useState('fantasy')
+  const [currentTheme, setCurrentTheme] = useState(Object.keys(themes).find(key => themes[key] === defaultTheme) || 'fantasy')
 
   const themeNames = Object.keys(themes)
   const theme = themes[currentTheme]

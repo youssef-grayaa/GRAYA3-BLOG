@@ -37,4 +37,4 @@ export const themes = {
   }
 }
 
-export const currentTheme = themes.matrix
+export const currentTheme = themes.cyberpunk
