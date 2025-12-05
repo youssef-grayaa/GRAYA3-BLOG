@@ -7,6 +7,7 @@ import archiver from 'archiver'
 const LOCAL_PATH = '/home/grayaa_vx/CTF_Writeups'
 
 export default defineConfig({
+  base: '/GRAYA3-BLOG/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
