@@ -1,6 +1,7 @@
 {
   "name": "ctf-blog",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "local": "VITE_LOCAL=true vite",
