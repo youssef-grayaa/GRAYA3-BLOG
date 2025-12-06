@@ -8,7 +8,9 @@ import { themes, currentTheme as defaultTheme } from './theme'
 
 const IS_LOCAL = import.meta.env.VITE_LOCAL === 'true'
 const REPO = 'youssef-grayaa/CTF_Writeups'
+const POSTS_REPO = 'youssef-grayaa/random_posts'
 const API = `https://api.github.com/repos/${REPO}/contents`
+const POSTS_API = `https://api.github.com/repos/${POSTS_REPO}/contents`
 const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN
 
 const fetchWithAuth = (url) => {
@@ -21,12 +23,13 @@ const fetchWithAuth = (url) => {
 
 function App() {
   const [challenges, setChallenges] = useState([])
+  const [posts, setPosts] = useState([])
   const [selected, setSelected] = useState(null)
   const [markdown, setMarkdown] = useState('')
   const [loading, setLoading] = useState(true)
   const [solver, setSolver] = useState('')
   const [showSolver, setShowSolver] = useState(false)
-  const [page, setPage] = useState('home') // 'home', 'ctf', 'malware'
+  const [page, setPage] = useState('home') // 'home', 'ctf', 'malware', 'posts', 'posts'
   const [currentTheme, setCurrentTheme] = useState(Object.keys(themes).find(key => themes[key] === defaultTheme) || 'fantasy')
 
   const themeNames = Object.keys(themes)
@@ -55,6 +58,7 @@ function App() {
   
   useEffect(() => {
     fetchChallenges()
+    fetchPosts()
   }, [])
 
   const fetchChallenges = async () => {
@@ -104,6 +108,45 @@ function App() {
     }
     
     setChallenges(allChallenges)
+  }
+
+  const fetchPosts = async () => {
+    try {
+      if (IS_LOCAL) {
+        const res = await fetch('/api/posts')
+        const data = await res.json()
+        setPosts(data)
+      } else {
+        const res = await fetchWithAuth(POSTS_API)
+        const data = await res.json()
+        const mdFiles = data.filter(item => item.name.endsWith('.md'))
+        setPosts(mdFiles.map(f => ({
+          name: f.name.replace('.md', ''),
+          url: f.download_url
+        })))
+      }
+    } catch (err) {
+      console.error('Error fetching posts:', err)
+    }
+  }
+
+  const loadPost = async (post) => {
+    setSelected(post)
+    setLoading(true)
+    try {
+      if (IS_LOCAL) {
+        const res = await fetch(`/api/post?name=${post.name}`)
+        const text = await res.text()
+        setMarkdown(text)
+      } else {
+        const res = await fetch(post.url)
+        const text = await res.text()
+        setMarkdown(text)
+      }
+    } catch (err) {
+      setMarkdown('# Error loading post')
+    }
+    setLoading(false)
   }
 
   const loadWriteup = async (challenge) => {
@@ -230,6 +273,9 @@ function App() {
           <button className="nav-btn" onClick={() => setPage('malware')}>
             MALWARE_SHENANIGANS
           </button>
+          <button className="nav-btn" onClick={() => setPage('posts')}>
+            RANDOM_POSTS
+          </button>
         </div>
       </div>
     )
@@ -256,6 +302,45 @@ function App() {
             reverse engineering deep dives, and other digital chaos.
           </p>
         </div>
+      </div>
+    )
+  }
+
+  if (page === 'posts') {
+    return (
+      <div className="app">
+        <PixelBlastBg />
+        <button className="theme-toggle" onClick={cycleTheme} title={`Theme: ${currentTheme}`}>
+          <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
+        </button>
+        <div className="header" style={{ position: 'relative', zIndex: 1 }}>
+          <h1>RANDOM_POSTS</h1>
+          <p>▸ Thoughts & Musings ◂</p>
+        </div>
+
+        {!selected ? (
+          <>
+            <button className="back-btn" onClick={() => setPage('home')} style={{position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1}}>
+              <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
+            </button>
+            <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
+              {posts.map((p, i) => (
+                <div key={i} className="challenge-card" onClick={() => loadPost(p)}>
+                  <h3>{p.name.replace(/_/g, ' ')}</h3>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <button className="back-btn" onClick={() => setSelected(null)} style={{ zIndex: 1 }}>
+              <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
+            </button>
+            <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
+              <ReactMarkdown>{markdown}</ReactMarkdown>
+            </div>
+          </>
+        )}
       </div>
     )
   }

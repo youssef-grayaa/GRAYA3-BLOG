@@ -5,6 +5,7 @@ import path from 'path'
 import archiver from 'archiver'
 
 const LOCAL_PATH = '/home/grayaa_vx/CTF_Writeups'
+const LOCAL_POSTS_PATH = '/home/grayaa_vx/random_posts'
 
 export default defineConfig({
   base: '/GRAYA3-BLOG/',
@@ -102,6 +103,36 @@ export default defineConfig({
           } else {
             res.statusCode = 404
             res.end('Solution folder not found')
+          }
+        })
+
+        server.middlewares.use('/api/posts', (req, res) => {
+          const posts = []
+          const files = fs.readdirSync(LOCAL_POSTS_PATH).filter(f => f.endsWith('.md'))
+          
+          for (const file of files) {
+            posts.push({
+              name: file.replace('.md', ''),
+              url: `/api/post?name=${file.replace('.md', '')}`
+            })
+          }
+
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify(posts))
+        })
+
+        server.middlewares.use('/api/post', (req, res) => {
+          const url = new URL(req.url, `http://${req.headers.host}`)
+          const name = url.searchParams.get('name')
+          const postPath = path.join(LOCAL_POSTS_PATH, `${name}.md`)
+
+          if (fs.existsSync(postPath)) {
+            const content = fs.readFileSync(postPath, 'utf-8')
+            res.setHeader('Content-Type', 'text/plain')
+            res.end(content)
+          } else {
+            res.statusCode = 404
+            res.end('Post not found')
           }
         })
       }
