@@ -337,7 +337,23 @@ function App() {
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
             <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
-              <ReactMarkdown>{markdown}</ReactMarkdown>
+              <ReactMarkdown
+                components={{
+                  img: ({ src, alt }) => {
+                    // Transform relative image URLs to absolute GitHub raw URLs
+                    let imageUrl = src
+                    if (src && !src.startsWith('http') && selected?.url) {
+                      const baseUrl = selected.url.replace(/\/[^/]*\.md$/, '')
+                      imageUrl = src.startsWith('./') 
+                        ? `${baseUrl}/${src.slice(2)}`
+                        : `${baseUrl}/${src}`
+                    }
+                    return <img src={imageUrl} alt={alt} style={{ maxWidth: '100%' }} />
+                  }
+                }}
+              >
+                {markdown}
+              </ReactMarkdown>
             </div>
           </>
         )}
@@ -376,7 +392,23 @@ function App() {
             <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
           </button>
           <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
-            <ReactMarkdown>{markdown}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                img: ({ src, alt }) => {
+                  // Transform relative image URLs to absolute GitHub raw URLs
+                  let imageUrl = src
+                  if (src && !src.startsWith('http') && selected?.writeupUrl) {
+                    const baseUrl = selected.writeupUrl.replace('/WRITEUP.md', '')
+                    imageUrl = src.startsWith('./') 
+                      ? `${baseUrl}/${src.slice(2)}`
+                      : `${baseUrl}/${src}`
+                  }
+                  return <img src={imageUrl} alt={alt} style={{ maxWidth: '100%' }} />
+                }
+              }}
+            >
+              {markdown}
+            </ReactMarkdown>
             <button className="download-btn" onClick={() => setShowSolver(!showSolver)}>
               {showSolver ? '▲ HIDE SOLVER' : '▼ VIEW SOLVER SCRIPT'}
             </button>
