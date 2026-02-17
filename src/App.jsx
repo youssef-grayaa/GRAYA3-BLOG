@@ -196,7 +196,7 @@ function App() {
     if (IS_LOCAL) {
       window.location.href = `/api/download?ctf=${selected.ctf}&name=${selected.name}`
     } else {
-      const url = `https://github.com/${REPO}/archive/refs/heads/main.zip`
+      const url = `https://github.com/${REPO}/tree/main/${selected.ctf}/${selected.name}/Handout`
       window.open(url, '_blank')
     }
   }
