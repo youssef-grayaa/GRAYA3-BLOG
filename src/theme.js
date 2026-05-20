@@ -34,7 +34,19 @@ export const themes = {
     borderAccent: '#00ff00',
     borderDark: '#003300',
     pixelBlast: '#00ff00',
+  }, 
+    red: {
+    background: '#000000',
+    text: '#ff0000',
+    textSecondary: '#cc0000',
+    primary: '#ff0000',
+    cardBg: '#110000',
+    cardBgHover: '#220000',
+    border: '#ff0000',
+    borderAccent: '#ff0000',
+    borderDark: '#330000',
+    pixelBlast: '#ff0000',
   }
 }
 
-export const currentTheme = themes.cyberpunk
+export const currentTheme = themes.red

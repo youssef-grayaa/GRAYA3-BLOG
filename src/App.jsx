@@ -241,7 +241,7 @@ function App() {
           <h2>About Me</h2>
           <p>
             Hey there, I'm <strong>Grayaa</strong>, a full-time code slicer and part-time digital ghost 
-            navigating the neon shadows of cyberspace. Cybersecurity isn't just a job—it's my playground. 
+            navigating the neon shadows of cyberspace.
             From dissecting malware to bending systems in ways corpos pray never happen, I'm here to 
             explore the underbelly of code and the art of digital survival.
           </p>
