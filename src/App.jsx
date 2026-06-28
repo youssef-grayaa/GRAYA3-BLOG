@@ -11,16 +11,6 @@ const REPO = 'youssef-grayaa/CTF_Writeups'
 const POSTS_REPO = 'youssef-grayaa/random_posts'
 const API = `https://api.github.com/repos/${REPO}/contents`
 const POSTS_API = `https://api.github.com/repos/${POSTS_REPO}/contents`
-const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN
-
-const fetchWithAuth = (url) => {
-  const headers = {}
-  if (GITHUB_TOKEN) {
-    headers['Authorization'] = `token ${GITHUB_TOKEN}`
-  }
-  return fetch(url, { headers })
-}
-
 function App() {
   const [challenges, setChallenges] = useState([])
   const [posts, setPosts] = useState([])
@@ -82,18 +72,18 @@ function App() {
   }
 
   const fetchGithubChallenges = async () => {
-    const res = await fetchWithAuth(API)
+    const res = await fetch(API)
     const data = await res.json()
     const ctfs = data.filter(item => item.type === 'dir' && !item.name.startsWith('.'))
     
     const allChallenges = []
     for (const ctf of ctfs) {
-      const ctfRes = await fetchWithAuth(ctf.url)
+      const ctfRes = await fetch(ctf.url)
       const ctfData = await ctfRes.json()
       const challengeDirs = ctfData.filter(item => item.type === 'dir')
       
       for (const challenge of challengeDirs) {
-        const chalRes = await fetchWithAuth(challenge.url)
+        const chalRes = await fetch(challenge.url)
         const chalData = await chalRes.json()
         const writeup = chalData.find(f => f.name === 'WRITEUP.md')
         
@@ -117,7 +107,7 @@ function App() {
         const data = await res.json()
         setPosts(data)
       } else {
-        const res = await fetchWithAuth(POSTS_API)
+        const res = await fetch(POSTS_API)
         const data = await res.json()
         const mdFiles = data.filter(item => item.name.endsWith('.md'))
         setPosts(mdFiles.map(f => ({
@@ -173,7 +163,7 @@ function App() {
         // Try to fetch solver from GitHub
         const solverUrl = challenge.writeupUrl.replace('/WRITEUP.md', '/Solution/')
         try {
-          const solverDirRes = await fetchWithAuth(`https://api.github.com/repos/${REPO}/contents/${challenge.ctf}/${challenge.name}/Solution`)
+          const solverDirRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${challenge.ctf}/${challenge.name}/Solution`)
           const files = await solverDirRes.json()
           const pyFile = files.find(f => f.name.endsWith('.py'))
           
