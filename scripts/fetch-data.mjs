@@ -8,12 +8,19 @@ const HEADERS = process.env.GITHUB_TOKEN
   ? { Authorization: `token ${process.env.GITHUB_TOKEN}` }
   : {}
 
-async function fetchJSON(url) {
-  const res = await fetch(url, { headers: HEADERS })
-  if (!res.ok) {
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+async function fetchJSON(url, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, { headers: HEADERS })
+    if (res.ok) return res.json()
+    if (res.status >= 500 && attempt < retries) {
+      console.warn(`Retry ${attempt + 1}/${retries} for ${url} (${res.status})`)
+      await sleep(1000 * (attempt + 1))
+      continue
+    }
     throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`)
   }
-  return res.json()
 }
 
 async function main() {
@@ -36,11 +43,23 @@ async function fetchChallenges() {
 
   const challenges = []
   for (const ctf of ctfs) {
-    const ctfData = await fetchJSON(ctf.url)
+    let ctfData
+    try {
+      ctfData = await fetchJSON(ctf.url)
+    } catch (err) {
+      console.warn(`Skipping CTF ${ctf.name}: ${err.message}`)
+      continue
+    }
     const challengeDirs = ctfData.filter(item => item.type === 'dir')
 
     for (const challenge of challengeDirs) {
-      const chalData = await fetchJSON(challenge.url)
+      let chalData
+      try {
+        chalData = await fetchJSON(challenge.url)
+      } catch (err) {
+        console.warn(`Skipping challenge ${ctf.name}/${challenge.name}: ${err.message}`)
+        continue
+      }
       const writeup = chalData.find(f => f.name === 'WRITEUP.md')
       if (!writeup) continue
 
@@ -69,14 +88,19 @@ async function fetchChallenges() {
 }
 
 async function fetchPosts() {
-  const API = `https://api.github.com/repos/${POSTS_REPO}/contents`
-  const data = await fetchJSON(API)
-  return data
-    .filter(item => item.name.endsWith('.md'))
-    .map(f => ({
-      name: f.name.replace('.md', ''),
-      url: f.download_url
-    }))
+  try {
+    const API = `https://api.github.com/repos/${POSTS_REPO}/contents`
+    const data = await fetchJSON(API)
+    return data
+      .filter(item => item.name.endsWith('.md'))
+      .map(f => ({
+        name: f.name.replace('.md', ''),
+        url: f.download_url
+      }))
+  } catch (err) {
+    console.warn(`Could not fetch posts: ${err.message}`)
+    return []
+  }
 }
 
 async function fetchMalwareWriteups() {
@@ -87,7 +111,13 @@ async function fetchMalwareWriteups() {
 
     const writeups = []
     for (const dir of dirs) {
-      const dirData = await fetchJSON(dir.url)
+      let dirData
+      try {
+        dirData = await fetchJSON(dir.url)
+      } catch (err) {
+        console.warn(`Skipping malware dir ${dir.name}: ${err.message}`)
+        continue
+      }
       const writeup = dirData.find(f => f.name === 'WRITEUP.md')
       if (writeup) {
         writeups.push({
@@ -98,16 +128,16 @@ async function fetchMalwareWriteups() {
     }
 
     return writeups
-  } catch {
-    console.warn('Could not fetch malware writeups (repo may not exist yet)')
+  } catch (err) {
+    console.warn(`Could not fetch malware writeups: ${err.message}`)
     return []
   }
 }
 
 main().catch(err => {
-  console.error('Data fetch failed:', err)
+  console.error('Fatal data fetch error:', err)
   if (process.env.GITHUB_TOKEN) {
-    console.error('Fatal: GITHUB_TOKEN was provided but fetch still failed')
+    console.error('GITHUB_TOKEN was set but root fetch failed — aborting')
     process.exit(1)
   }
   console.error('Writing empty data files so local build can proceed')
