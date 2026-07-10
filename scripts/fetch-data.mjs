@@ -118,7 +118,7 @@ async function fetchMalwareWriteups() {
         console.warn(`Skipping malware dir ${dir.name}: ${err.message}`)
         continue
       }
-      const writeup = dirData.find(f => f.name === 'WRITEUP.md')
+      const writeup = dirData.find(f => f.name === 'notes.md')
       if (writeup) {
         writeups.push({
           name: dir.name,

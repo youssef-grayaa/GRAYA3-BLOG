@@ -224,7 +224,7 @@ function App() {
                 img: ({ src, alt }) => {
                   let imageUrl = src
                   if (src && !src.startsWith('http') && selected?.writeupUrl) {
-                    const baseUrl = selected.writeupUrl.replace('/WRITEUP.md', '')
+                    const baseUrl = selected.writeupUrl.replace(/\/[^/]+\.md$/, '')
                     imageUrl = src.startsWith('./') ? `${baseUrl}/${src.slice(2)}` : `${baseUrl}/${src}`
                   }
                   return <img src={imageUrl} alt={alt} style={{ maxWidth: '100%' }} />
