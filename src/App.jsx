@@ -191,7 +191,7 @@ function App() {
           <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
         </button>
         <div className="header" style={{ position: 'relative', zIndex: 1 }}>
-          <h1>MALWARE_SHENANIGANS</h1>
+          <ShinyText text="polymorphic shellcode" />
           <p>▸ Reverse Engineering & Analysis ◂</p>
         </div>
         {!selected ? (
