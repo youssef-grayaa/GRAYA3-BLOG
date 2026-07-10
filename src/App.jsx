@@ -213,7 +213,7 @@ function App() {
                 letterSpacing: '3px',
                 marginBottom: '30px'
               }}>
-                polymorphic shellcode
+                MALWARE_SHENANIGANS
               </h1>
               {malwareList.length === 0 ? (
                 <>
