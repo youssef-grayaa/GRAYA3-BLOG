@@ -190,61 +190,51 @@ function App() {
         <button className="theme-toggle" onClick={cycleTheme} title={`Theme: ${currentTheme}`}>
           <img src={`${import.meta.env.BASE_URL}angry.png`} alt="Change Theme" />
         </button>
-        <button className="back-btn" onClick={selected ? () => { setSelected(null); setMarkdown(''); } : () => setPage('home')} style={{ zIndex: 1 }}>
-          <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
-        </button>
-        <div style={{
-          background: 'var(--card-bg)',
-          border: '3px solid var(--border)',
-          padding: '30px',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <h1 style={{
-            fontFamily: '"Jacquard 24", system-ui',
-            fontSize: '2.5rem',
-            color: 'var(--primary)',
-            textAlign: 'center',
-            letterSpacing: '5px',
-            marginBottom: '30px'
-          }}>
-            polymorphic shellcode
-          </h1>
-          {!selected ? (
-            malwareList.length === 0 ? (
-              <div>
-                <h2 style={{ fontFamily: '"Jacquard 24", system-ui', color: 'var(--primary)', fontSize: '2rem', textAlign: 'center', marginBottom: '20px' }}>
-                  Coming Soon
-                </h2>
-                <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  This section is currently under development. Check back soon for malware analysis,
-                  reverse engineering deep dives, and other digital chaos.
-                </p>
+        <div className="header" style={{ position: 'relative', zIndex: 1 }}>
+          <ShinyText text="polymorphic shellcode" />
+          <p>▸ Reverse Engineering & Analysis ◂</p>
+        </div>
+        {!selected ? (
+          <>
+            <button className="back-btn" onClick={() => setPage('home')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
+              <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
+            </button>
+            {malwareList.length === 0 ? (
+              <div className="about-section" style={{ position: 'relative', zIndex: 1 }}>
+                <h2>Coming Soon</h2>
+                <p style={{ textAlign: 'center' }}>This section is currently under development. Check back soon for malware analysis, reverse engineering deep dives, and other digital chaos.</p>
               </div>
             ) : (
-              <div className="challenges-grid">
+              <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
                 {malwareList.map((m, i) => (
                   <div key={i} className="challenge-card" onClick={() => loadMalwareWriteup(m)}>
-                    <h3>{m.name.replace(/_/g, ' ')}</h3>
+                    <h3>{m.name}</h3>
                   </div>
                 ))}
               </div>
-            )
-          ) : (
-            <ReactMarkdown components={{
-              img: ({ src, alt }) => {
-                let imageUrl = src
-                if (src && !src.startsWith('http') && selected?.writeupUrl) {
-                  const baseUrl = selected.writeupUrl.replace(/\/[^/]+\.md$/, '')
-                  imageUrl = src.startsWith('./') ? `${baseUrl}/${src.slice(2)}` : `${baseUrl}/${src}`
+            )}
+          </>
+        ) : (
+          <>
+            <button className="back-btn" onClick={() => { setSelected(null); setMarkdown(''); }} style={{ zIndex: 1 }}>
+              <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
+            </button>
+            <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
+              <ReactMarkdown components={{
+                img: ({ src, alt }) => {
+                  let imageUrl = src
+                  if (src && !src.startsWith('http') && selected?.writeupUrl) {
+                    const baseUrl = selected.writeupUrl.replace(/\/[^/]+\.md$/, '')
+                    imageUrl = src.startsWith('./') ? `${baseUrl}/${src.slice(2)}` : `${baseUrl}/${src}`
+                  }
+                  return <img src={imageUrl} alt={alt} style={{ maxWidth: '100%' }} />
                 }
-                return <img src={imageUrl} alt={alt} style={{ maxWidth: '100%' }} />
-              }
-            }}>
-              {markdown}
-            </ReactMarkdown>
-          )}
-        </div>
+              }}>
+                {markdown}
+              </ReactMarkdown>
+            </div>
+          </>
+        )}
       </div>
     )
   }
