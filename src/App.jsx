@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -13,6 +13,8 @@ import malwareData from './data/malware.json'
 const IS_LOCAL = import.meta.env.VITE_LOCAL === 'true'
 const REPO = 'youssef-grayaa/CTF_Writeups'
 
+const navigate = (hash) => { window.location.hash = hash }
+
 function App() {
   const [challenges, setChallenges] = useState([])
   const [posts, setPosts] = useState([])
@@ -26,6 +28,14 @@ function App() {
   const [currentTheme, setCurrentTheme] = useState(
     Object.keys(themes).find(key => themes[key] === defaultTheme) || 'fantasy'
   )
+
+  const challengesRef = useRef(challenges)
+  const postsRef = useRef(posts)
+  const malwareListRef = useRef(malwareList)
+
+  useEffect(() => { challengesRef.current = challenges }, [challenges])
+  useEffect(() => { postsRef.current = posts }, [posts])
+  useEffect(() => { malwareListRef.current = malwareList }, [malwareList])
 
   const themeNames = Object.keys(themes)
   const theme = themes[currentTheme]
@@ -50,6 +60,8 @@ function App() {
     root.style.setProperty('--pixel-blast', theme.pixelBlast)
   }, [currentTheme, theme])
 
+  const [dataLoaded, setDataLoaded] = useState(false)
+
   useEffect(() => {
     if (IS_LOCAL) {
       fetchLocalData()
@@ -57,6 +69,7 @@ function App() {
       setChallenges(challengesData)
       setPosts(postsData)
       setMalwareList(malwareData)
+      setDataLoaded(true)
       setLoading(false)
     }
   }, [])
@@ -72,8 +85,74 @@ function App() {
     } catch (err) {
       console.error(err)
     }
+    setDataLoaded(true)
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (!dataLoaded) return
+    if (window.location.hash) {
+      window.dispatchEvent(new Event('hashchange'))
+    }
+  }, [dataLoaded])
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '')
+      const parts = hash.split('/').filter(Boolean)
+
+      const c = challengesRef.current
+      const p = postsRef.current
+      const m = malwareListRef.current
+
+      if (parts.length === 0 || parts[0] === 'home') {
+        setPage('home')
+        setSelected(null)
+        setMarkdown('')
+        setSolver('')
+        setShowSolver(false)
+        return
+      }
+
+      if (parts[0] === 'ctf') {
+        setPage('ctf')
+        setSolver('')
+        setShowSolver(false)
+        if (parts.length >= 3) {
+          const challenge = c.find(x => x.ctf === decodeURIComponent(parts[1]) && x.name === decodeURIComponent(parts[2]))
+          if (challenge) { loadWriteup(challenge); return }
+        }
+        setSelected(null)
+        setMarkdown('')
+        return
+      }
+
+      if (parts[0] === 'malware') {
+        setPage('malware')
+        if (parts.length >= 2) {
+          const entry = m.find(x => x.name === decodeURIComponent(parts[1]))
+          if (entry) { loadMalwareWriteup(entry); return }
+        }
+        setSelected(null)
+        setMarkdown('')
+        return
+      }
+
+      if (parts[0] === 'posts') {
+        setPage('posts')
+        if (parts.length >= 2) {
+          const post = p.find(x => x.name === decodeURIComponent(parts[1]))
+          if (post) { loadPost(post); return }
+        }
+        setSelected(null)
+        setMarkdown('')
+        return
+      }
+    }
+
+    window.addEventListener('hashchange', handleHash)
+    return () => window.removeEventListener('hashchange', handleHash)
+  }, [])
 
   const loadPost = async (post) => {
     setSelected(post)
@@ -175,9 +254,9 @@ function App() {
           </div>
         </div>
         <div className="nav-buttons" style={{ position: 'relative', zIndex: 1 }}>
-          <button className="nav-btn" onClick={() => setPage('ctf')}>CTF WRITEUPS</button>
-          <button className="nav-btn" onClick={() => setPage('malware')}>MALWARE_SHENANIGANS</button>
-          <button className="nav-btn" onClick={() => setPage('posts')}>RANDOM_POSTS</button>
+          <button className="nav-btn" onClick={() => navigate('#/ctf')}>CTF WRITEUPS</button>
+          <button className="nav-btn" onClick={() => navigate('#/malware')}>MALWARE_SHENANIGANS</button>
+          <button className="nav-btn" onClick={() => navigate('#/posts')}>RANDOM_POSTS</button>
         </div>
       </div>
     )
@@ -196,7 +275,7 @@ function App() {
         </div>
         {!selected ? (
           <>
-            <button className="back-btn" onClick={() => setPage('home')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
+            <button className="back-btn" onClick={() => navigate('#/')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
             <div style={{
@@ -206,15 +285,22 @@ function App() {
               position: 'relative',
               zIndex: 1
             }}>
-              <h1 style={{
+              <a href="https://github.com/youssef-grayaa/polymorphic_malware" target="_blank" rel="noopener noreferrer" style={{
+                color: 'var(--text-secondary)',
+                textDecoration: 'underline',
+                textUnderlineOffset: '4px',
+                textDecorationColor: 'var(--border)',
+                transition: 'color 0.2s, text-decoration-color 0.2s',
+                fontSize: '1.5rem',
                 fontFamily: '"Pixelify Sans", monospace',
-                fontSize: '1rem',
-                color: 'var(--primary)',
                 letterSpacing: '3px',
+                display: 'inline-block',
                 marginBottom: '30px'
-              }}>
+              }}
+              onMouseEnter={e => { e.target.style.color = 'var(--primary)'; e.target.style.textDecorationColor = 'var(--primary)' }}
+              onMouseLeave={e => { e.target.style.color = 'var(--text-secondary)'; e.target.style.textDecorationColor = 'var(--border)' }}>
                 polymorphic shellcode
-              </h1>
+              </a>
               {malwareList.length === 0 ? (
                 <>
                   <h2 style={{ fontFamily: '"Jacquard 24", system-ui', color: 'var(--primary)', fontSize: '2rem', textAlign: 'center', marginBottom: '20px' }}>
@@ -228,7 +314,7 @@ function App() {
               ) : (
                 <div className="challenges-grid">
                   {malwareList.map((m, i) => (
-                    <div key={i} className="challenge-card" onClick={() => loadMalwareWriteup(m)}>
+                    <div key={i} className="challenge-card" onClick={() => navigate(`#/malware/${encodeURIComponent(m.name)}`)}>
                       <h3>{m.name}</h3>
                     </div>
                   ))}
@@ -238,7 +324,7 @@ function App() {
           </>
         ) : (
           <>
-            <button className="back-btn" onClick={() => { setSelected(null); setMarkdown(''); }} style={{ zIndex: 1 }}>
+            <button className="back-btn" onClick={() => navigate('#/malware')} style={{ zIndex: 1 }}>
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
             <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
@@ -274,12 +360,12 @@ function App() {
         </div>
         {!selected ? (
           <>
-            <button className="back-btn" onClick={() => setPage('home')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
+            <button className="back-btn" onClick={() => navigate('#/')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
             <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
               {posts.map((p, i) => (
-                <div key={i} className="challenge-card" onClick={() => loadPost(p)}>
+                <div key={i} className="challenge-card" onClick={() => navigate(`#/posts/${encodeURIComponent(p.name)}`)}>
                   <h3>{p.name.replace(/_/g, ' ')}</h3>
                 </div>
               ))}
@@ -287,7 +373,7 @@ function App() {
           </>
         ) : (
           <>
-            <button className="back-btn" onClick={() => setSelected(null)} style={{ zIndex: 1 }}>
+            <button className="back-btn" onClick={() => navigate('#/posts')} style={{ zIndex: 1 }}>
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
             <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
@@ -322,12 +408,12 @@ function App() {
       </div>
       {!selected ? (
         <>
-          <button className="back-btn" onClick={() => setPage('home')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
+          <button className="back-btn" onClick={() => navigate('#/')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
             <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
           </button>
           <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
             {challenges.map((c, i) => (
-              <div key={i} className="challenge-card" onClick={() => loadWriteup(c)}>
+              <div key={i} className="challenge-card" onClick={() => navigate(`#/ctf/${encodeURIComponent(c.ctf)}/${encodeURIComponent(c.name)}`)}>
                 <div className="ctf-name">[{c.ctf}]</div>
                 <h3>{c.name}</h3>
               </div>
@@ -336,7 +422,7 @@ function App() {
         </>
       ) : (
         <>
-          <button className="back-btn" onClick={() => setSelected(null)}>
+          <button className="back-btn" onClick={() => navigate('#/ctf')}>
             <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
           </button>
           <div className="writeup-container" style={{ position: 'relative', zIndex: 1 }}>
