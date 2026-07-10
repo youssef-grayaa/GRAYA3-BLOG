@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "local": "VITE_LOCAL=true vite",
+    "fetch-data": "node scripts/fetch-data.mjs",
+    "prebuild": "node scripts/fetch-data.mjs",
     "build": "vite build",
     "preview": "vite preview"
   },
