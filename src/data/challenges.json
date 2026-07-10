@@ -10,23 +10,5 @@
     "ctf": "CyberMaze_2025",
     "writeupUrl": "https://raw.githubusercontent.com/youssef-grayaa/CTF_Writeups/main/CyberMaze_2025/FINAL_BOSS/WRITEUP.md",
     "solverFile": "exploit.py"
-  },
-  {
-    "name": "Bit_Flips",
-    "ctf": "DarkestHour_2026",
-    "writeupUrl": "https://raw.githubusercontent.com/youssef-grayaa/CTF_Writeups/main/DarkestHour_2026/Bit_Flips/WRITEUP.md",
-    "solverFile": "solve.py"
-  },
-  {
-    "name": "Metared_Cine_Festival",
-    "ctf": "MetaRed_2025",
-    "writeupUrl": "https://raw.githubusercontent.com/youssef-grayaa/CTF_Writeups/main/MetaRed_2025/Metared_Cine_Festival/WRITEUP.md",
-    "solverFile": "booom.py"
-  },
-  {
-    "name": "Metared_Cine_Festival_level_2",
-    "ctf": "MetaRed_2025",
-    "writeupUrl": "https://raw.githubusercontent.com/youssef-grayaa/CTF_Writeups/main/MetaRed_2025/Metared_Cine_Festival_level_2/WRITEUP.md",
-    "solverFile": "BOOM.py"
   }
 ]
