@@ -206,6 +206,15 @@ function App() {
               position: 'relative',
               zIndex: 1
             }}>
+              <h1 style={{
+                fontFamily: '"Pixelify Sans", monospace',
+                fontSize: '1rem',
+                color: 'var(--primary)',
+                letterSpacing: '3px',
+                marginBottom: '30px'
+              }}>
+                polymorphic shellcode
+              </h1>
               {malwareList.length === 0 ? (
                 <>
                   <h2 style={{ fontFamily: '"Jacquard 24", system-ui', color: 'var(--primary)', fontSize: '2rem', textAlign: 'center', marginBottom: '20px' }}>
