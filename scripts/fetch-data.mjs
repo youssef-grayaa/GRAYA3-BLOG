@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from 'fs'
+import { writeFileSync, mkdirSync, existsSync } from 'fs'
 
 const REPO = 'youssef-grayaa/CTF_Writeups'
 const POSTS_REPO = 'youssef-grayaa/random_posts'
@@ -140,10 +140,9 @@ main().catch(err => {
     console.error('GITHUB_TOKEN was set but root fetch failed — aborting')
     process.exit(1)
   }
-  console.error('Writing empty data files so local build can proceed')
   mkdirSync('src/data', { recursive: true })
-  writeFileSync('src/data/challenges.json', '[]')
-  writeFileSync('src/data/posts.json', '[]')
-  writeFileSync('src/data/malware.json', '[]')
+  if (!existsSync('src/data/challenges.json')) writeFileSync('src/data/challenges.json', '[]')
+  if (!existsSync('src/data/posts.json')) writeFileSync('src/data/posts.json', '[]')
+  if (!existsSync('src/data/malware.json')) writeFileSync('src/data/malware.json', '[]')
   process.exit(0)
 })

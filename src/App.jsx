@@ -199,20 +199,33 @@ function App() {
             <button className="back-btn" onClick={() => setPage('home')} style={{ position: 'relative', left: 0, bottom: 0, marginBottom: '20px', zIndex: 1 }}>
               <img src={`${import.meta.env.BASE_URL}arrow-right.png`} alt="Back" />
             </button>
-            {malwareList.length === 0 ? (
-              <div className="about-section" style={{ position: 'relative', zIndex: 1 }}>
-                <h2>Coming Soon</h2>
-                <p style={{ textAlign: 'center' }}>This section is currently under development. Check back soon for malware analysis, reverse engineering deep dives, and other digital chaos.</p>
-              </div>
-            ) : (
-              <div className="challenges-grid" style={{ position: 'relative', zIndex: 1 }}>
-                {malwareList.map((m, i) => (
-                  <div key={i} className="challenge-card" onClick={() => loadMalwareWriteup(m)}>
-                    <h3>{m.name}</h3>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div style={{
+              background: 'var(--card-bg)',
+              border: '3px solid var(--border)',
+              padding: '30px',
+              position: 'relative',
+              zIndex: 1
+            }}>
+              {malwareList.length === 0 ? (
+                <>
+                  <h2 style={{ fontFamily: '"Jacquard 24", system-ui', color: 'var(--primary)', fontSize: '2rem', textAlign: 'center', marginBottom: '20px' }}>
+                    Coming Soon
+                  </h2>
+                  <p style={{ textAlign: 'center' }}>
+                    This section is currently under development. Check back soon for malware analysis,
+                    reverse engineering deep dives, and other digital chaos.
+                  </p>
+                </>
+              ) : (
+                <div className="challenges-grid">
+                  {malwareList.map((m, i) => (
+                    <div key={i} className="challenge-card" onClick={() => loadMalwareWriteup(m)}>
+                      <h3>{m.name}</h3>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         ) : (
           <>
